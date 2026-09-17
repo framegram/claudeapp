@@ -1,6 +1,8 @@
 package com.example.circuittimerapp;
 
 import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private int totalTime = 0;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean isRunning = false;
+    private ToneGenerator toneGenerator;
+    private static final int ALARM_COUNTDOWN_SECONDS = 5;
 
     private final Runnable tickRunnable = new Runnable() {
         @Override
@@ -43,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
             if (timeLeft > 0) {
                 timeLeft--;
                 updateDisplay();
+                if (timeLeft <= ALARM_COUNTDOWN_SECONDS) {
+                    playCountdownBeep(timeLeft == 0);
+                }
             }
 
             if (timeLeft > 0) {
@@ -87,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
         initViews();
         loadWeightsFromStorage();
+        toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME);
 
         startBtn.setOnClickListener(v -> startTimer());
         pauseBtn.setOnClickListener(v -> pauseTimer());
@@ -102,6 +110,17 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         isRunning = false;
         handler.removeCallbacks(tickRunnable);
+        if (toneGenerator != null) {
+            toneGenerator.release();
+            toneGenerator = null;
+        }
+    }
+
+    private void playCountdownBeep(boolean isPhaseEnd) {
+        if (toneGenerator == null) return;
+        toneGenerator.startTone(
+                isPhaseEnd ? ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD : ToneGenerator.TONE_PROP_BEEP,
+                isPhaseEnd ? 400 : 150);
     }
 
     private void initViews() {
