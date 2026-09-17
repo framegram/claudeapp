@@ -132,8 +132,8 @@ public class MainActivity extends AppCompatActivity {
         startBtn.setVisibility(View.GONE);
         pauseBtn.setVisibility(View.VISIBLE);
 
-        if (!isResting) {
-            // エクササイズ開始
+        if (totalTime == 0) {
+            // 新しいフェーズの開始(一時停止からの再開時はtimeLeft/totalTimeを維持して続きから再生)
             WorkoutSet currentSet = workoutPlan.get(currentSetIndex);
             Exercise currentExercise = currentSet.exercises.get(currentExerciseIndex);
             totalTime = currentExercise.duration;
@@ -141,11 +141,6 @@ public class MainActivity extends AppCompatActivity {
 
             // バーベル種目なら重量入力欄を表示
             weightSection.setVisibility(currentExercise.isBarbell ? View.VISIBLE : View.GONE);
-        } else {
-            // 休憩開始
-            totalTime = currentSetIndex < workoutPlan.size() ?
-                    workoutPlan.get(currentSetIndex).restAfter : 0;
-            timeLeft = totalTime;
         }
 
         updateDisplay();
@@ -223,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
         timeLeft = 0;
         totalTime = 0;
         weightSection.setVisibility(View.GONE);
+        setLabel.setText("完了");
         exerciseName.setText("トレーニング終了！");
         timerDisplay.setText("00:00");
         progressBar.setProgress(0);
