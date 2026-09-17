@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -16,8 +17,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -26,9 +29,25 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String KEY_HEIGHT_CM = "user_height_cm";
     private static final String KEY_BGM_PLAYLIST = "bgm_playlist";
 
+    // 種目ごとの推奨ダンベル重量(体重に対する割合)[初心者, 中級者, 上級者]
+    private static final Map<String, float[]> WEIGHT_GUIDE_PERCENT = new LinkedHashMap<>();
+    private static final float[] DEFAULT_WEIGHT_GUIDE_PERCENT = {0.08f, 0.15f, 0.22f};
+
+    static {
+        WEIGHT_GUIDE_PERCENT.put("ダンベルベンチプレス", new float[]{0.15f, 0.25f, 0.35f});
+        WEIGHT_GUIDE_PERCENT.put("ダンベルキックバック", new float[]{0.04f, 0.07f, 0.10f});
+        WEIGHT_GUIDE_PERCENT.put("ダンベルデッドリフト", new float[]{0.20f, 0.35f, 0.50f});
+        WEIGHT_GUIDE_PERCENT.put("ダンベルカール", new float[]{0.06f, 0.10f, 0.15f});
+        WEIGHT_GUIDE_PERCENT.put("ダンベルショルダープレス", new float[]{0.10f, 0.18f, 0.28f});
+        WEIGHT_GUIDE_PERCENT.put("ダンベルランジ", new float[]{0.10f, 0.18f, 0.28f});
+        WEIGHT_GUIDE_PERCENT.put("ダンベルロウ", new float[]{0.15f, 0.25f, 0.35f});
+        WEIGHT_GUIDE_PERCENT.put("ダンベルトライセプスエクステンション", new float[]{0.05f, 0.09f, 0.13f});
+        WEIGHT_GUIDE_PERCENT.put("ダンベルスクワットプレス", new float[]{0.10f, 0.18f, 0.28f});
+    }
+
     private EditText weightKgInput, heightCmInput, bgmUrlInput;
-    private TextView bmiText, caloriesText, proteinText, fatText, carbsText;
-    private LinearLayout bgmListContainer;
+    private TextView bmiText, caloriesText, proteinText, fatText, carbsText, weightGuideHint;
+    private LinearLayout bgmListContainer, weightGuideContainer;
 
     private final List<String> bgmPlaylist = new ArrayList<>();
 
@@ -45,6 +64,8 @@ public class SettingsActivity extends AppCompatActivity {
         proteinText = findViewById(R.id.proteinText);
         fatText = findViewById(R.id.fatText);
         carbsText = findViewById(R.id.carbsText);
+        weightGuideHint = findViewById(R.id.weightGuideHint);
+        weightGuideContainer = findViewById(R.id.weightGuideContainer);
         bgmListContainer = findViewById(R.id.bgmListContainer);
 
         findViewById(R.id.saveProfileBtn).setOnClickListener(v -> saveProfile());
@@ -73,6 +94,9 @@ public class SettingsActivity extends AppCompatActivity {
         if (weight > 0 && height > 0) {
             updateNutritionDisplay(weight, height);
         }
+        if (weight > 0) {
+            updateWeightGuide(weight);
+        }
     }
 
     private void saveProfile() {
@@ -97,6 +121,7 @@ public class SettingsActivity extends AppCompatActivity {
             editor.apply();
 
             updateNutritionDisplay(weight, height);
+            updateWeightGuide(weight);
             Toast.makeText(this, "保存しました", Toast.LENGTH_SHORT).show();
         } catch (NumberFormatException e) {
             Toast.makeText(this, "有効な数値を入力してください", Toast.LENGTH_SHORT).show();
@@ -117,6 +142,46 @@ public class SettingsActivity extends AppCompatActivity {
         proteinText.setText(String.format(Locale.getDefault(), "目安タンパク質: %.0f g/日", proteinG));
         fatText.setText(String.format(Locale.getDefault(), "目安脂質: %.0f g/日", fatG));
         carbsText.setText(String.format(Locale.getDefault(), "目安炭水化物: %.0f g/日", carbsG));
+    }
+
+    private void updateWeightGuide(float weightKg) {
+        weightGuideHint.setVisibility(View.GONE);
+        weightGuideContainer.removeAllViews();
+
+        for (MainActivity.WorkoutSet set : MainActivity.getWorkoutPlan()) {
+            for (MainActivity.Exercise exercise : set.exercises) {
+                float[] percent = WEIGHT_GUIDE_PERCENT.getOrDefault(exercise.name, DEFAULT_WEIGHT_GUIDE_PERCENT);
+                double beginner = roundToHalf(weightKg * percent[0]);
+                double intermediate = roundToHalf(weightKg * percent[1]);
+                double advanced = roundToHalf(weightKg * percent[2]);
+
+                LinearLayout row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.VERTICAL);
+                LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                rowParams.topMargin = dpToPx(10);
+                row.setLayoutParams(rowParams);
+
+                TextView nameText = new TextView(this);
+                nameText.setText(exercise.name);
+                nameText.setTextColor(Color.WHITE);
+                nameText.setTextSize(13f);
+
+                TextView levelsText = new TextView(this);
+                levelsText.setText(String.format(Locale.getDefault(),
+                        "初心者: %.1fkg　中級者: %.1fkg　上級者: %.1fkg", beginner, intermediate, advanced));
+                levelsText.setTextColor(Color.parseColor("#b2bec3"));
+                levelsText.setTextSize(12f);
+
+                row.addView(nameText);
+                row.addView(levelsText);
+                weightGuideContainer.addView(row);
+            }
+        }
+    }
+
+    private double roundToHalf(double value) {
+        return Math.round(value * 2) / 2.0;
     }
 
     private String trimNumber(float value) {
