@@ -98,13 +98,13 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <ImageView
+                <TextView
                     android:id="@+id/exerciseImage"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_dumbbell" />
+                    android:text="💪"
+                    android:textSize="26sp" />
 
                 <Button
                     android:id="@+id/referenceUrlBtn"
