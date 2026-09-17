@@ -65,26 +65,26 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    // ワークアウトプラン(バーベル・ダンベル)
+    // ワークアウトプラン(全種目ダンベル)
     private final List<WorkoutSet> workoutPlan = Arrays.asList(
             new WorkoutSet(1, Arrays.asList(
-                    new Exercise("バーベルベンチプレス", 150, "胸", true),
+                    new Exercise("ダンベルベンチプレス", 150, "胸", false),
                     new Exercise("ダンベルキックバック", 150, "三頭筋", false)
             ), 60),
             new WorkoutSet(2, Arrays.asList(
-                    new Exercise("バーベルデッドリフト", 150, "背筋・足", true),
+                    new Exercise("ダンベルデッドリフト", 150, "背筋・足", false),
                     new Exercise("ダンベルカール", 150, "二頭筋", false)
             ), 60),
             new WorkoutSet(3, Arrays.asList(
-                    new Exercise("バーベルオーバーヘッドプレス", 150, "肩・三頭", true),
+                    new Exercise("ダンベルショルダープレス", 150, "肩・三頭", false),
                     new Exercise("ダンベルランジ", 150, "足", false)
             ), 60),
             new WorkoutSet(4, Arrays.asList(
-                    new Exercise("バーベルロウ", 150, "背筋", true),
+                    new Exercise("ダンベルロウ", 150, "背筋", false),
                     new Exercise("ダンベルトライセプスエクステンション", 150, "三頭筋", false)
             ), 60),
             new WorkoutSet(5, Arrays.asList(
-                    new Exercise("スクワットプレス", 300, "全身フィニッシャー", true)
+                    new Exercise("ダンベルスクワットプレス", 300, "全身フィニッシャー", false)
             ), 0)
     );
 
@@ -181,8 +181,8 @@ public class MainActivity extends AppCompatActivity {
             totalTime = currentExercise.duration;
             timeLeft = totalTime;
 
-            // バーベル種目なら重量入力欄を表示
-            weightSection.setVisibility(currentExercise.isBarbell ? View.VISIBLE : View.GONE);
+            // 重量調整可能な種目なので常に重量入力欄を表示
+            weightSection.setVisibility(View.VISIBLE);
         }
 
         updateDisplay();
@@ -243,13 +243,8 @@ public class MainActivity extends AppCompatActivity {
         timeLeft = totalTime;
         updateDisplay();
 
-        WorkoutSet activeSet = currentSetIndex < workoutPlan.size() ? workoutPlan.get(currentSetIndex) : null;
-        if (!isResting && activeSet != null) {
-            Exercise activeExercise = activeSet.exercises.get(currentExerciseIndex);
-            weightSection.setVisibility(activeExercise.isBarbell ? View.VISIBLE : View.GONE);
-        } else {
-            weightSection.setVisibility(View.GONE);
-        }
+        boolean hasActiveExercise = !isResting && currentSetIndex < workoutPlan.size();
+        weightSection.setVisibility(hasActiveExercise ? View.VISIBLE : View.GONE);
 
         handler.post(tickRunnable);
     }
