@@ -91,6 +91,31 @@
                 android:textSize="14sp" />
 
             <LinearLayout
+                android:id="@+id/exercisePreview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/exerciseImage"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="10dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_dumbbell" />
+
+                <Button
+                    android:id="@+id/referenceUrlBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="参考動画を見る"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/weightSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -181,14 +206,29 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/clearDataBtn"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="データ初期化"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView" />
+        app:layout_constraintTop_toBottomOf="@+id/cardView">
+
+        <Button
+            android:id="@+id/settingsBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="設定" />
+
+        <Button
+            android:id="@+id/clearDataBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="データ初期化" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

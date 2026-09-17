@@ -1,14 +1,17 @@
 package com.example.circuittimerapp;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,9 +27,11 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView setLabel, exerciseName, timerDisplay, instructionText;
     private ProgressBar progressBar;
-    private Button startBtn, pauseBtn, resetBtn, saveWeightBtn, clearDataBtn;
+    private Button startBtn, pauseBtn, resetBtn, saveWeightBtn, clearDataBtn, settingsBtn, referenceUrlBtn;
     private EditText weightInput;
-    private LinearLayout weightSection;
+    private LinearLayout weightSection, exercisePreview;
+    private ImageView exerciseImage;
+    private Exercise displayedExercise;
 
     private int currentSetIndex = 0;
     private int currentExerciseIndex = 0;
@@ -107,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
         resetBtn.setOnClickListener(v -> resetTimer());
         saveWeightBtn.setOnClickListener(v -> saveWeight());
         clearDataBtn.setOnClickListener(v -> clearData());
+        settingsBtn.setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
+        referenceUrlBtn.setOnClickListener(v -> openReferenceVideo());
 
         updateDisplay();
     }
@@ -141,8 +148,18 @@ public class MainActivity extends AppCompatActivity {
         resetBtn = findViewById(R.id.resetBtn);
         saveWeightBtn = findViewById(R.id.saveWeightBtn);
         clearDataBtn = findViewById(R.id.clearDataBtn);
+        settingsBtn = findViewById(R.id.settingsBtn);
+        referenceUrlBtn = findViewById(R.id.referenceUrlBtn);
         weightInput = findViewById(R.id.weightInput);
         weightSection = findViewById(R.id.weightSection);
+        exercisePreview = findViewById(R.id.exercisePreview);
+        exerciseImage = findViewById(R.id.exerciseImage);
+    }
+
+    private void openReferenceVideo() {
+        if (displayedExercise == null) return;
+        String query = Uri.encode(displayedExercise.name + " やり方");
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/results?search_query=" + query)));
     }
 
     private void startTimer() {
@@ -242,7 +259,9 @@ public class MainActivity extends AppCompatActivity {
         isWorkoutComplete = true;
         timeLeft = 0;
         totalTime = 0;
+        displayedExercise = null;
         weightSection.setVisibility(View.GONE);
+        exercisePreview.setVisibility(View.GONE);
         setLabel.setText("完了");
         exerciseName.setText("トレーニング終了！");
         timerDisplay.setText("00:00");
@@ -264,13 +283,18 @@ public class MainActivity extends AppCompatActivity {
         if (!isResting) {
             WorkoutSet currentSet = workoutPlan.get(currentSetIndex);
             Exercise currentExercise = currentSet.exercises.get(currentExerciseIndex);
+            displayedExercise = currentExercise;
             setLabel.setText(String.format(Locale.getDefault(), "SET %d / %d", currentSetIndex + 1, workoutPlan.size()));
             String text = currentExercise.name;
             if (currentExercise.weight != null) {
                 text += "\n重量: " + formatWeight(currentExercise.weight) + "kg";
             }
             exerciseName.setText(text);
+            exerciseImage.setImageResource(currentExercise.isBarbell ? R.drawable.ic_barbell : R.drawable.ic_dumbbell);
+            exercisePreview.setVisibility(View.VISIBLE);
         } else {
+            displayedExercise = null;
+            exercisePreview.setVisibility(View.GONE);
             setLabel.setText("休憩中");
             exerciseName.setText("休憩中\n次のセットへ");
         }
