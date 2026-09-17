@@ -94,7 +94,13 @@ public class MainActivity extends AppCompatActivity {
 
         initViews();
         loadWeightsFromStorage();
-        toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME);
+        try {
+            toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, ToneGenerator.MAX_VOLUME);
+        } catch (RuntimeException e) {
+            // 一部端末ではアラームストリームの初期化に失敗することがあるため、
+            // その場合はビープ音なしで動作を継続する
+            toneGenerator = null;
+        }
 
         startBtn.setOnClickListener(v -> startTimer());
         pauseBtn.setOnClickListener(v -> pauseTimer());
