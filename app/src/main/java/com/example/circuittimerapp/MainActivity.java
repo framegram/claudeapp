@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,17 +20,35 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+
+    // 種目名 -> res/drawable に置く画像ファイル名(拡張子なし)。
+    // ファイルが存在しない種目は画像を表示せず、ボタンだけ表示する。
+    private static final Map<String, String> EXERCISE_IMAGE_RES_NAMES = new HashMap<>();
+
+    static {
+        EXERCISE_IMAGE_RES_NAMES.put("ダンベルベンチプレス", "exercise_bench_press");
+        EXERCISE_IMAGE_RES_NAMES.put("ダンベルキックバック", "exercise_kickback");
+        EXERCISE_IMAGE_RES_NAMES.put("ダンベルデッドリフト", "exercise_deadlift");
+        EXERCISE_IMAGE_RES_NAMES.put("ダンベルカール", "exercise_curl");
+        EXERCISE_IMAGE_RES_NAMES.put("ダンベルショルダープレス", "exercise_shoulder_press");
+        EXERCISE_IMAGE_RES_NAMES.put("ダンベルランジ", "exercise_lunge");
+        EXERCISE_IMAGE_RES_NAMES.put("ダンベルロウ", "exercise_row");
+        EXERCISE_IMAGE_RES_NAMES.put("ダンベルトライセプスエクステンション", "exercise_triceps_extension");
+        EXERCISE_IMAGE_RES_NAMES.put("ダンベルスクワットプレス", "exercise_squat_press");
+    }
 
     private TextView setLabel, exerciseName, timerDisplay, instructionText;
     private ProgressBar progressBar;
     private Button startBtn, pauseBtn, resetBtn, saveWeightBtn, clearDataBtn, settingsBtn, referenceUrlBtn;
     private EditText weightInput;
     private LinearLayout weightSection, exercisePreview;
-    private TextView exerciseImage;
+    private ImageView exerciseImage;
     private Exercise displayedExercise;
 
     private int currentSetIndex = 0;
@@ -165,6 +184,12 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/results?search_query=" + query)));
     }
 
+    private int getExerciseImageResId(String exerciseName) {
+        String resName = EXERCISE_IMAGE_RES_NAMES.get(exerciseName);
+        if (resName == null) return 0;
+        return getResources().getIdentifier(resName, "drawable", getPackageName());
+    }
+
     private void startTimer() {
         if (isRunning) return;
 
@@ -288,7 +313,13 @@ public class MainActivity extends AppCompatActivity {
                 text += "\n重量: " + formatWeight(currentExercise.weight) + "kg";
             }
             exerciseName.setText(text);
-            exerciseImage.setText(currentExercise.isBarbell ? "🏋️" : "💪");
+            int imageResId = getExerciseImageResId(currentExercise.name);
+            if (imageResId != 0) {
+                exerciseImage.setImageResource(imageResId);
+                exerciseImage.setVisibility(View.VISIBLE);
+            } else {
+                exerciseImage.setVisibility(View.GONE);
+            }
             exercisePreview.setVisibility(View.VISIBLE);
         } else {
             displayedExercise = null;
