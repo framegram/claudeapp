@@ -11,7 +11,6 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private Button startBtn, pauseBtn, resetBtn, saveWeightBtn, clearDataBtn, settingsBtn, referenceUrlBtn;
     private EditText weightInput;
     private LinearLayout weightSection, exercisePreview;
-    private ImageView exerciseImage;
+    private TextView exerciseImage;
     private Exercise displayedExercise;
 
     private int currentSetIndex = 0;
@@ -289,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
                 text += "\n重量: " + formatWeight(currentExercise.weight) + "kg";
             }
             exerciseName.setText(text);
-            exerciseImage.setImageResource(currentExercise.isBarbell ? R.drawable.ic_barbell : R.drawable.ic_dumbbell);
+            exerciseImage.setText(currentExercise.isBarbell ? "🏋️" : "💪");
             exercisePreview.setVisibility(View.VISIBLE);
         } else {
             displayedExercise = null;
