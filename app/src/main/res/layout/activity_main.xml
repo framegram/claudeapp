@@ -96,15 +96,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <TextView
+                <ImageView
                     android:id="@+id/exerciseImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:text="💪"
-                    android:textSize="26sp" />
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:layout_marginBottom="8dp"
+                    android:adjustViewBounds="true"
+                    android:background="#ffffff"
+                    android:contentDescription="@null"
+                    android:padding="4dp"
+                    android:scaleType="fitCenter"
+                    android:visibility="gone" />
 
                 <Button
                     android:id="@+id/referenceUrlBtn"
