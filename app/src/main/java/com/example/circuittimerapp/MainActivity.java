@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     // ワークアウトプラン(全種目ダンベル)
-    private final List<WorkoutSet> workoutPlan = Arrays.asList(
+    private static final List<WorkoutSet> workoutPlan = Arrays.asList(
             new WorkoutSet(1, Arrays.asList(
                     new Exercise("ダンベルベンチプレス", 150, "胸", false),
                     new Exercise("ダンベルキックバック", 150, "三頭筋", false)
@@ -91,6 +91,10 @@ public class MainActivity extends AppCompatActivity {
     // ローカルストレージ用
     private static final String PREFS_NAME = "WorkoutPrefs";
     private static final String WEIGHT_KEY_PREFIX = "weight_set_";
+
+    static List<WorkoutSet> getWorkoutPlan() {
+        return workoutPlan;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
